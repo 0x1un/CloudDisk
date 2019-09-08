@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
 	"time"
 
 	"github.com/0x1un/CloudDisk/filemeta"
@@ -16,6 +15,7 @@ import (
 // UploadHandler: handing the file upload
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
+		log.Printf("%s - %s", r.Method, r.URL.Path)
 		// render index.html
 		if filedata, err := ioutil.ReadFile("./static/view/upload.html"); err != nil {
 			log.Fatalf("failed read to upload.html: %s", err.Error())
@@ -23,6 +23,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			io.WriteString(w, string(filedata))
 		}
 	} else if r.Method == "POST" {
+		log.Printf("%s - %s", r.Method, r.URL.Path)
 		// copy file to local from index form file
 		file, fileHead, err := r.FormFile("file")
 		if err != nil {
@@ -33,13 +34,14 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		fmeta := filemeta.FileMeta{
 			FileName: fileHead.Filename,
 			Location: location,
-			UploadAt: time.Now().Format("1999-09-22 03:50:00"),
+			UploadAt: time.Now().Format("2006-01-02 15:04:05"),
 		}
 		newFile, err := os.Create(location)
 		if err != nil {
 			log.Fatalf("failed: cannot to create file or direcotry: %s", err.Error())
 		}
 		fmeta.FileSize, err = io.Copy(newFile, file)
+		log.Printf("File Name: %s, File Size: %d KB", fmeta.FileName, fmeta.FileSize/1024)
 		if err != nil {
 			log.Fatalf("failed copy content to new file: %s", err.Error())
 		}

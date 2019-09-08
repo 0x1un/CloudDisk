@@ -1,13 +1,15 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/0x1un/CloudDisk/handler"
 )
 
 func main() {
+	log.Println("Starting server...")
 	http.HandleFunc("/file/upload", handler.UploadHandler)
 	http.HandleFunc("/file/upload/success", handler.UploadSuccessHandler)
-	http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
