@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -46,8 +48,8 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatalf("failed copy content to new file: %s", err.Error())
 		}
 		newFile.Seek(0, 0) // !! must be move *seek* to head
-		filemeta.UpdateFileMeta(fmeta)
 		fmeta.FileMD5 = util.ComputeFileMD5(location)
+		filemeta.UpdateFileMeta(fmeta)
 		defer newFile.Close()
 		http.Redirect(w, r, "/file/upload/success", http.StatusFound)
 	}
@@ -55,4 +57,17 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 func UploadSuccessHandler(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "<h2>Upload file successfully!</h2>")
+}
+
+func GetFileMetaByMD5(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	filemd5 := r.Form["filemd5"][0]
+	fmeta := filemeta.GetFileMeta(filemd5)
+	fmt.Println(fmeta)
+	retdata, err := json.Marshal(fmeta)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(retdata)
 }
