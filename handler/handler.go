@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/0x1un/CloudDisk/filemeta"
@@ -59,7 +60,7 @@ func UploadSuccessHandler(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "<h2>Upload file successfully!</h2>")
 }
 
-func GetFileMetaByMD5(w http.ResponseWriter, r *http.Request) {
+func GetFileMetaByMD5Handler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	filemd5 := r.Form["filemd5"][0]
 	fmeta := filemeta.GetFileMeta(filemd5)
@@ -70,4 +71,16 @@ func GetFileMetaByMD5(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(retdata)
+}
+
+func GetRecentFileMetasHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	limitCount, _ := strconv.Atoi(r.Form.Get("limit"))
+	fmetaArray := filemeta.GetRecentFileMetas(limitCount)
+	data, err := json.Marshal(fmetaArray)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
 }
