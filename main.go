@@ -15,5 +15,6 @@ func main() {
 	http.HandleFunc("/file/meta", handler.GetFileMetaByMD5Handler)
 	http.HandleFunc("/file/batchQuery", handler.GetRecentFileMetasHandler)
 	http.HandleFunc("/file/download", handler.DownloadHandler)
+	http.HandleFunc("/file/updateName", handler.FileUpdateMetaHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
