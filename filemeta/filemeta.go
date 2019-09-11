@@ -37,3 +37,7 @@ func GetRecentFileMetas(limit int) []FileMeta {
 	sort.Sort(ByUploadAtTime(fMetaArray))
 	return fMetaArray[0:limit]
 }
+
+func DeleteFileMeta(filemd5 string) {
+	delete(fileMetas, filemd5)
+}
