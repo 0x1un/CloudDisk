@@ -56,10 +56,12 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UploadSuccessHandler: return a successfully message
 func UploadSuccessHandler(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "<h2>Upload file successfully!</h2>")
 }
 
+// GetFileMetaByMD5Handler: get file meta by md5, returned a json
 func GetFileMetaByMD5Handler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	filemd5 := r.Form["filemd5"][0]
@@ -73,6 +75,7 @@ func GetFileMetaByMD5Handler(w http.ResponseWriter, r *http.Request) {
 	w.Write(retdata)
 }
 
+// GetRecentFileMetasHandler: return an recently uploaded files, returned a json
 func GetRecentFileMetasHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	limitCount, _ := strconv.Atoi(r.Form.Get("limit"))
@@ -82,5 +85,26 @@ func GetRecentFileMetasHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.Write(data)
+}
+
+// DownloadHandler: download file by file md5
+func DownloadHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	fmd5 := r.Form.Get("fmd5")
+	fmeta := filemeta.GetFileMeta(fmd5)
+	f, err := os.Open(fmeta.Location)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+	w.Header().Set("Content-Type", "application/octect-stream")                         // !!!
+	w.Header().Set("Content-Disposition", "attachment;filename=\""+fmeta.FileName+"\"") // !!!
 	w.Write(data)
 }
