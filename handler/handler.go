@@ -108,3 +108,30 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", "attachment;filename=\""+fmeta.FileName+"\"") // !!!
 	w.Write(data)
 }
+
+func FileUpdateMetaHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	opType := r.Form.Get("op")
+	if opType != "0" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	fMD5 := r.Form.Get("filemd5")
+	filename := r.Form.Get("filename")
+
+	fileMeta := filemeta.GetFileMeta(fMD5)
+	fileMeta.FileName = filename
+	filemeta.UpdateFileMeta(fileMeta)
+	data, err := json.Marshal(fileMeta)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
