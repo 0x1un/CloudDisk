@@ -135,3 +135,16 @@ func FileUpdateMetaHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
 }
+
+func DeleteFileHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	filemd5 := r.Form.Get("filemd5")
+	err := os.Remove(filemeta.GetFileMeta(filemd5).Location)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	filemeta.DeleteFileMeta(filemd5)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok, deleted!"))
+}
