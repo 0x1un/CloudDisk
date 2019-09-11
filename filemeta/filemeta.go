@@ -10,8 +10,10 @@ type FileMeta struct {
 	UploadAt string // format time: 2006-09-01 15:04:06
 }
 
+// fileMetas: store file meta info
 var fileMetas map[string]FileMeta
 
+// init: to initalize fileMetas
 func init() {
 	fileMetas = make(map[string]FileMeta)
 }
@@ -21,10 +23,12 @@ func UpdateFileMeta(filemeta FileMeta) {
 	fileMetas[filemeta.FileMD5] = filemeta
 }
 
+// GetFileMeta: return a filemeta by file md5 value
 func GetFileMeta(filemd5 string) FileMeta {
 	return fileMetas[filemd5]
 }
 
+// GetRecentFileMetas: get recently uploaded files by limit count
 func GetRecentFileMetas(limit int) []FileMeta {
 	fMetaArray := make([]FileMeta, len(fileMetas))
 	for _, value := range fileMetas {
