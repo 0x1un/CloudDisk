@@ -109,6 +109,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+// FileUpdateMetaHandler: rename file meta => fileMetas.FileName
 func FileUpdateMetaHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	opType := r.Form.Get("op")
