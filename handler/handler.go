@@ -137,6 +137,7 @@ func FileUpdateMetaHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+// DeleteFileHandler: delete file by file md5
 func DeleteFileHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	filemd5 := r.Form.Get("filemd5")
