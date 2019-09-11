@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/0x1un/CloudDisk/filemeta"
@@ -55,11 +56,13 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UploadSuccessHandler: return a successfully message
 func UploadSuccessHandler(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "<h2>Upload file successfully!</h2>")
 }
 
-func GetFileMetaByMD5(w http.ResponseWriter, r *http.Request) {
+// GetFileMetaByMD5Handler: get file meta by md5, returned a json
+func GetFileMetaByMD5Handler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	filemd5 := r.Form["filemd5"][0]
 	fmeta := filemeta.GetFileMeta(filemd5)
@@ -70,4 +73,79 @@ func GetFileMetaByMD5(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(retdata)
+}
+
+// GetRecentFileMetasHandler: return an recently uploaded files, returned a json
+func GetRecentFileMetasHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	limitCount, _ := strconv.Atoi(r.Form.Get("limit"))
+	fmetaArray := filemeta.GetRecentFileMetas(limitCount)
+	data, err := json.Marshal(fmetaArray)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
+}
+
+// DownloadHandler: download file by file md5
+func DownloadHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	fmd5 := r.Form.Get("fmd5")
+	fmeta := filemeta.GetFileMeta(fmd5)
+	f, err := os.Open(fmeta.Location)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+	w.Header().Set("Content-Type", "application/octect-stream")                         // !!!
+	w.Header().Set("Content-Disposition", "attachment;filename=\""+fmeta.FileName+"\"") // !!!
+	w.Write(data)
+}
+
+// FileUpdateMetaHandler: rename file meta => fileMetas.FileName
+func FileUpdateMetaHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	opType := r.Form.Get("op")
+	if opType != "0" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	fMD5 := r.Form.Get("filemd5")
+	filename := r.Form.Get("filename")
+
+	fileMeta := filemeta.GetFileMeta(fMD5)
+	fileMeta.FileName = filename
+	filemeta.UpdateFileMeta(fileMeta)
+	data, err := json.Marshal(fileMeta)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+func DeleteFileHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	filemd5 := r.Form.Get("filemd5")
+	err := os.Remove(filemeta.GetFileMeta(filemd5).Location)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	filemeta.DeleteFileMeta(filemd5)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok, deleted!"))
 }
