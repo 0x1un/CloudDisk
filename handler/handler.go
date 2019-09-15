@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -66,9 +65,15 @@ func UploadSuccessHandler(w http.ResponseWriter, r *http.Request) {
 func GetFileMetaByMD5Handler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	filemd5 := r.Form["filemd5"][0]
-	fmeta := filemeta.GetFileMeta(filemd5)
-	fmt.Println(fmeta)
-	retdata, err := json.Marshal(fmeta)
+	// fmeta := filemeta.GetFileMeta(filemd5)
+	fmeta, err := filemeta.GetFileMetaFromDB(filemd5)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("file meta not found"))
+		return
+	}
+	// fmt.Println(fmeta)
+	retdata, err := json.Marshal(*fmeta)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
