@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sort"
 
+	"errors"
+
 	pg "github.com/0x1un/CloudDisk/db/pg"
 )
 
@@ -61,6 +63,29 @@ func OnFileUploadFinished(fmeta *FileMeta) bool {
 		fmt.Printf("Failed insert to tables: %s", err.Error())
 		return false
 	}
+	// defer insert.Close()
 	insert.Commit()
+
 	return true
+}
+
+type TableFileMeta struct {
+	FileMD5  string
+	FileName string
+	FileSize int64
+	Location string
+	UploadAt string // format time: 2006-09-01 15:04:06
+}
+
+// GetFileMetaFromDB: get file meta from postgres db
+func GetFileMetaFromDB(filemd5 string) (*TableFileMeta, error) {
+	fm := &TableFileMeta{}
+	// query := pg.DBConnect().Where("file_md5 = ? and status = 1", filemd5).First(fm)
+	query := pg.DBConnect().Table("filemetas").Select("file_md5,file_name,file_size,location,upload_at").Where("file_md5 = ? and status = 0", filemd5).First(fm)
+	if query.RecordNotFound() {
+		return nil, errors.New("Record not found")
+	}
+	fmt.Printf("%v\n", fm)
+	// defer query.Close()
+	return fm, nil
 }
