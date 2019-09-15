@@ -50,7 +50,8 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		newFile.Seek(0, 0) // !! must be move *seek* to head
 		fmeta.FileMD5 = util.ComputeFileMD5(location)
-		filemeta.UpdateFileMeta(fmeta)
+		// filemeta.UpdateFileMeta(fmeta)
+		_ = filemeta.UpdateFileMetaDB(&fmeta)
 		defer newFile.Close()
 		http.Redirect(w, r, "/file/upload/success", http.StatusFound)
 	}
