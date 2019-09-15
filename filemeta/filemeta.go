@@ -1,6 +1,11 @@
 package filemeta
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+
+	pg "github.com/0x1un/CloudDisk/db/pg"
+)
 
 type FileMeta struct {
 	FileMD5  string
@@ -23,6 +28,11 @@ func UpdateFileMeta(filemeta FileMeta) {
 	fileMetas[filemeta.FileMD5] = filemeta
 }
 
+// UpdateFileMetaDB: store file meta into postgres
+func UpdateFileMetaDB(filemeta *FileMeta) bool {
+	return OnFileUploadFinished(filemeta)
+}
+
 // GetFileMeta: return a filemeta by file md5 value
 func GetFileMeta(filemd5 string) FileMeta {
 	return fileMetas[filemd5]
@@ -38,6 +48,19 @@ func GetRecentFileMetas(limit int) []FileMeta {
 	return fMetaArray[0:limit]
 }
 
+// DeleteFileMeta: delete file meta from fileMetas map
 func DeleteFileMeta(filemd5 string) {
 	delete(fileMetas, filemd5)
+}
+
+// OnFileUploadFinished: store file meta into postgres
+func OnFileUploadFinished(fmeta *FileMeta) bool {
+	insert := pg.DBConnect().Begin()
+	if err := insert.Table("filemetas").Create(fmeta).Error; err != nil {
+		insert.Rollback()
+		fmt.Printf("Failed insert to tables: %s", err.Error())
+		return false
+	}
+	insert.Commit()
+	return true
 }
