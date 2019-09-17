@@ -2,6 +2,7 @@ package filemeta
 
 import (
 	"fmt"
+	"log"
 	"sort"
 
 	"errors"
@@ -10,6 +11,15 @@ import (
 )
 
 type FileMeta struct {
+	FileMD5  string
+	FileName string
+	FileSize int64
+	Location string
+	UploadAt string // format time: 2006-09-01 15:04:06
+}
+
+// TableFileMeta: store filemeta
+type TableFileMeta struct {
 	FileMD5  string
 	FileName string
 	FileSize int64
@@ -69,23 +79,15 @@ func OnFileUploadFinished(fmeta *FileMeta) bool {
 	return true
 }
 
-type TableFileMeta struct {
-	FileMD5  string
-	FileName string
-	FileSize int64
-	Location string
-	UploadAt string // format time: 2006-09-01 15:04:06
-}
-
 // GetFileMetaFromDB: get file meta from postgres db
 func GetFileMetaFromDB(filemd5 string) (*TableFileMeta, error) {
 	fm := &TableFileMeta{}
 	// query := pg.DBConnect().Where("file_md5 = ? and status = 1", filemd5).First(fm)
+
 	query := pg.DBConnect().Table("filemetas").Select("file_md5,file_name,file_size,location,upload_at").Where("file_md5 = ? and status = 0", filemd5).First(fm)
 	if query.RecordNotFound() {
 		return nil, errors.New("Record not found")
 	}
-	fmt.Printf("%v\n", fm)
-	// defer query.Close()
+	log.Printf("FileMeta: %v\n", *fm)
 	return fm, nil
 }
