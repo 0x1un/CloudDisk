@@ -2,24 +2,13 @@ package filemeta
 
 import (
 	"fmt"
-	"log"
 	"sort"
 
-	"errors"
-
+	db "github.com/0x1un/CloudDisk/db"
 	pg "github.com/0x1un/CloudDisk/db/pg"
 )
 
 type FileMeta struct {
-	FileMD5  string
-	FileName string
-	FileSize int64
-	Location string
-	UploadAt string // format time: 2006-09-01 15:04:06
-}
-
-// TableFileMeta: store filemeta
-type TableFileMeta struct {
 	FileMD5  string
 	FileName string
 	FileSize int64
@@ -51,13 +40,20 @@ func GetFileMeta(filemd5 string) FileMeta {
 }
 
 // GetRecentFileMetas: get recently uploaded files by limit count
-func GetRecentFileMetas(limit int) []FileMeta {
-	fMetaArray := make([]FileMeta, len(fileMetas))
-	for _, value := range fileMetas {
-		fMetaArray = append(fMetaArray, value)
+func GetRecentFileMetas(limit int) []db.TableFileMeta {
+	// fMetaArray := make([]FileMeta, len(fileMetas))
+	// for _, value := range fileMetas {
+	// fMetaArray = append(fMetaArray, value)
+	// }
+
+	fMetaArray, err := db.GetRecentFileMetasFromDB(limit)
+	if err != nil {
+		fmt.Printf("Failed get filemetas by limit, reason: %s", err.Error())
+		return nil
 	}
 	sort.Sort(ByUploadAtTime(fMetaArray))
-	return fMetaArray[0:limit]
+	fmt.Printf("%v\n", fMetaArray)
+	return fMetaArray
 }
 
 // DeleteFileMeta: delete file meta from fileMetas map
@@ -77,17 +73,4 @@ func OnFileUploadFinished(fmeta *FileMeta) bool {
 	insert.Commit()
 
 	return true
-}
-
-// GetFileMetaFromDB: get file meta from postgres db
-func GetFileMetaFromDB(filemd5 string) (*TableFileMeta, error) {
-	fm := &TableFileMeta{}
-	// query := pg.DBConnect().Where("file_md5 = ? and status = 1", filemd5).First(fm)
-
-	query := pg.DBConnect().Table("filemetas").Select("file_md5,file_name,file_size,location,upload_at").Where("file_md5 = ? and status = 0", filemd5).First(fm)
-	if query.RecordNotFound() {
-		return nil, errors.New("Record not found")
-	}
-	log.Printf("FileMeta: %v\n", *fm)
-	return fm, nil
 }

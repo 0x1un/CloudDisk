@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/0x1un/CloudDisk/db"
 	"github.com/0x1un/CloudDisk/filemeta"
 	"github.com/0x1un/CloudDisk/util"
 )
@@ -66,7 +67,7 @@ func GetFileMetaByMD5Handler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	filemd5 := r.Form["filemd5"][0]
 	// fmeta := filemeta.GetFileMeta(filemd5)
-	fmeta, err := filemeta.GetFileMetaFromDB(filemd5)
+	fmeta, err := db.GetFileMetaFromDB(filemd5)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("file meta not found"))

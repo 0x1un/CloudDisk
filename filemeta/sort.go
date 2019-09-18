@@ -1,8 +1,12 @@
 package filemeta
 
-import "time"
+import (
+	"time"
 
-type ByUploadAtTime []FileMeta
+	db "github.com/0x1un/CloudDisk/db"
+)
+
+type ByUploadAtTime []db.TableFileMeta
 
 const baseFortmatTime = "2006-01-02 15:04:05"
 
