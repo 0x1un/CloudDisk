@@ -29,8 +29,8 @@ func GetFileMetaFromDB(filemd5 string) (*TableFileMeta, error) {
 }
 
 func GetRecentFileMetasFromDB(limit int) ([]TableFileMeta, error) {
-	tempFileMeta := make([]TableFileMeta, limit)
-	query := pg.DBConnect().Table("filemetas").Select("file_md5,file_name,file_size,location,upload_at").Where("status = 0", &tempFileMeta).Limit(limit)
+	var tempFileMeta []TableFileMeta
+	query := pg.DBConnect().Table("filemetas").Select("file_md5,file_name,file_size,location,upload_at").Where("status = 0").Limit(limit).Find(&tempFileMeta)
 	if query.RecordNotFound() {
 		return nil, errors.New("Record not found")
 	}
