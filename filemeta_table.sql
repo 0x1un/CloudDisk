@@ -5,7 +5,7 @@ create table if not exists filemetas (
     file_size numeric(20) default '0',
     location varchar(1024) not null default '',
     upload_at timestamp default 'now',
-    status smallint not null default '0',
+    status smallint not null default '1',
     ext1 int default '0',
     ext2 text
 );
@@ -18,9 +18,9 @@ create table if not exists users (
     id serial not null primary key,
     user_name varchar(20) not null default '',
     user_pwd varchar(256) not null default '',
-    email varchar(64) not null default '',
-    phone varchar(11) default '' unique,
-    email_validate boolean not null default false,
+    email varchar(64) default '',
+    phone varchar(11) default '',
+    email_validate boolean default false,
     phone_validate boolean default false,
     signup_at timestamp default 'now',
     last_active timestamp default 'now',
@@ -28,5 +28,5 @@ create table if not exists users (
     status smallint not null default '0'
 );
 
-create index user_idx_status on users using btree(status);
-create unique index user_idx_phone on users using btree(phone);
+-- create index user_idx_status on users using btree(status);
+-- create unique index user_idx_phone on users using btree(phone);
