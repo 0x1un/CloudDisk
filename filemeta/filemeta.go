@@ -64,7 +64,7 @@ func DeleteFileMeta(filemd5 string) {
 // OnFileUploadFinished: store file meta into postgres
 func OnFileUploadFinished(fmeta *FileMeta) bool {
 	insert := pg.DBConnect().Begin()
-	if err := insert.Table("filemetas").Create(fmeta).Error; err != nil {
+	if err := insert.Table("filemetas").FirstOrCreate(fmeta).Error; err != nil {
 		insert.Rollback()
 		fmt.Printf("Failed insert to tables: %s", err.Error())
 		return false
