@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -23,7 +24,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		if filedata, err := ioutil.ReadFile("./static/view/upload.html"); err != nil {
 			log.Fatalf("failed read to upload.html: %s", err.Error())
 		} else {
-			io.WriteString(w, string(filedata))
+			w.Write(filedata)
 		}
 	} else if r.Method == "POST" {
 		log.Printf("%s - %s", r.Method, r.URL.Path)
@@ -33,7 +34,8 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatalf("failed get file: %s", err.Error())
 		}
 		defer file.Close()
-		location := "./tmp/" + fileHead.Filename
+		location := util.Conf.Location + "/" + fileHead.Filename
+		fmt.Println(location)
 		fmeta := filemeta.FileMeta{
 			FileName: fileHead.Filename,
 			Location: location,
