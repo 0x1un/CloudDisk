@@ -20,7 +20,7 @@ type TableFileMeta struct {
 func GetFileMetaFromDB(filemd5 string) (*TableFileMeta, error) {
 	fm := &TableFileMeta{}
 	// query := pg.DBConnect().Where("file_md5 = ? and status = 1", filemd5).First(fm)
-	query := pg.DBConnect().Table("filemetas").Select("file_md5,file_name,file_size,location,upload_at").Where("file_md5 = ? and status = 0", filemd5).First(fm)
+	query := pg.DBConnect().Table("filemetas").Select("file_md5,file_name,file_size,location,upload_at").Where("file_md5 = ? and status = 1", filemd5).First(fm)
 	if query.RecordNotFound() {
 		return nil, errors.New("Record not found")
 	}
@@ -28,6 +28,7 @@ func GetFileMetaFromDB(filemd5 string) (*TableFileMeta, error) {
 	return fm, nil
 }
 
+// GetRecentFileMetasFromDB: batch query the file metas from db
 func GetRecentFileMetasFromDB(limit int) ([]TableFileMeta, error) {
 	var tempFileMeta []TableFileMeta
 	query := pg.DBConnect().Table("filemetas").Select("file_md5,file_name,file_size,location,upload_at").Where("status = 0").Limit(limit).Find(&tempFileMeta)
