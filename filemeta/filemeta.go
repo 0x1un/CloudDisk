@@ -14,6 +14,7 @@ type FileMeta struct {
 	FileSize int64
 	Location string
 	UploadAt string // format time: 2006-09-01 15:04:06
+	Status   int
 }
 
 // fileMetas: store file meta info
@@ -31,7 +32,7 @@ func UpdateFileMeta(filemeta FileMeta) {
 
 // UpdateFileMetaDB: store file meta into postgres
 func UpdateFileMetaDB(filemeta *FileMeta) bool {
-	return OnFileUploadFinished(filemeta)
+	return onFileUploadFinished(filemeta)
 }
 
 // GetFileMeta: return a filemeta by file md5 value
@@ -62,9 +63,9 @@ func DeleteFileMeta(filemd5 string) {
 }
 
 // OnFileUploadFinished: store file meta into postgres
-func OnFileUploadFinished(fmeta *FileMeta) bool {
+func onFileUploadFinished(fmeta *FileMeta) bool {
 	insert := pg.DBConnect().Begin()
-	if err := insert.Table("filemetas").FirstOrCreate(fmeta).Error; err != nil {
+	if err := insert.Table("filemetas").Create(fmeta).Error; err != nil {
 		insert.Rollback()
 		fmt.Printf("Failed insert to tables: %s", err.Error())
 		return false
