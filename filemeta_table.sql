@@ -30,3 +30,10 @@ create table if not exists users (
 
 -- create index user_idx_status on users using btree(status);
 -- create unique index user_idx_phone on users using btree(phone);
+
+
+create table if not exists user_tokens(
+    id serial not null primary key,
+    user_name varchar(20) not null default '',
+    user_token varchar(48) not null default '' unique
+);
