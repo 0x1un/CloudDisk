@@ -20,5 +20,7 @@ func main() {
 	http.HandleFunc("/file/updateName", handler.FileUpdateMetaHandler)
 	http.HandleFunc("/file/delete", handler.DeleteFileHandler)
 	http.HandleFunc("/user/signup", handler.UserSignupHandler)
+	http.HandleFunc("/user/login", handler.UserLoginHandler)
+	http.HandleFunc("/user/profile", handler.UserProfileHandler)
 	log.Fatal(http.ListenAndServe(util.Conf.Port, nil))
 }
