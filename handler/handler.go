@@ -36,7 +36,8 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		defer file.Close()
 		location := util.Conf.Location + "/" + fileHead.Filename
 		fmt.Println(location)
-		fmeta := filemeta.FileMeta{
+		// fmeta := filemeta.FileMeta{
+		fmeta := db.TableFileMeta{
 			FileName: fileHead.Filename,
 			Location: location,
 			UploadAt: time.Now().Format("2006-01-02 15:04:05"),
