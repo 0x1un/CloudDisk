@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	pg "github.com/0x1un/CloudDisk/db/pg"
@@ -14,6 +15,7 @@ type TableFileMeta struct {
 	FileSize int64
 	Location string
 	UploadAt string // format time: 2006-09-01 15:04:06
+	Status   int
 }
 
 // GetFileMetaFromDB: get file meta from postgres db
@@ -37,4 +39,31 @@ func GetRecentFileMetasFromDB(limit int) ([]TableFileMeta, error) {
 	}
 	log.Printf("FileMeta: %v\n", tempFileMeta)
 	return tempFileMeta, nil
+}
+
+// OnFileUploadFinished: store file meta into postgres
+func OnFileUploadFinished(fmeta *TableFileMeta) bool {
+	insert := pg.DBConnect().Begin()
+	if err := insert.Table("filemetas").Create(fmeta).Error; err != nil {
+		insert.Rollback()
+		fmt.Printf("Failed insert to tables: %s", err.Error())
+		return false
+	}
+	// defer insert.Close()
+	insert.Commit()
+
+	return true
+}
+
+// DeleteFileMetaFromDB: logic delete file (set status to 0)
+func DeleteFileMetaFromDB(dfile TableFileMeta) bool {
+	// logic delete
+	handler := pg.DBConnect().Begin()
+	if err := handler.Model(&dfile).Where("file_md5 = ?", dfile.FileMD5).Update("status", 0).Error; err != nil {
+		log.Printf("Failed to delete file: %s\n", err.Error())
+		handler.Rollback()
+		return false
+	}
+	handler.Commit()
+	return true
 }
