@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -11,11 +10,6 @@ import (
 
 // main: beging
 func main() {
-	hash, err := util.EncodePWDToBcrpty("goodluck@123")
-	if err != nil {
-		return
-	}
-	fmt.Println(string(hash))
 	log.Println("Starting server...")
 	log.Printf("Please open browser and paste the url: %s\n", "http://localhost"+util.Conf.Port)
 	http.HandleFunc("/file/upload", handler.UploadHandler)
