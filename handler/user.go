@@ -58,23 +58,20 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		data, err := ioutil.ReadFile("./static/view/signin.html")
 		if err != nil {
-			log.Fatal("Failed to open signin.html")
 			w.WriteHeader(http.StatusNotFound)
 			return
-		} else {
-			w.Write(data)
 		}
+		w.Write(data)
 	}
 	if r.Method == http.MethodPost {
-
 		r.ParseForm()
 		username := r.Form.Get("username")
 		fmt.Println(username)
 		password := r.Form.Get("password")
 		fmt.Println(password)
 		isOk := db.UserLoginMatcher(username, password)
+		token := GenerateToken(username)
 		if isOk {
-			token := GenerateToken(username)
 			updateOk := db.UpdateUserToken(&db.UserTokens{
 				UserName:  username,
 				UserToken: token,
@@ -84,8 +81,32 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+		respJson := util.NewRespJson(
+			0, "Ok", struct {
+				Location string
+				Username string
+				Token    string
+			}{
+				Location: "http://" + r.Host + "/home",
+				Username: username,
+				Token:    token,
+			})
+		w.Write(respJson.JsonBytes())
 	}
-	w.Write([]byte("http://" + r.Host + "/static/view/home.html"))
+}
+
+func HomePageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		data, err := ioutil.ReadFile("./static/view/home.html")
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		w.Write(data)
+		return
+	}
+	w.WriteHeader(http.StatusInternalServerError)
+	return
 }
 
 // UserProfileHandler: get user info
