@@ -22,5 +22,6 @@ func main() {
 	http.HandleFunc("/user/signup", handler.UserSignupHandler)
 	http.HandleFunc("/user/login", handler.UserLoginHandler)
 	http.HandleFunc("/user/profile", handler.UserProfileHandler)
+	http.HandleFunc("/home", handler.HomePageHandler)
 	log.Fatal(http.ListenAndServe(util.Conf.Port, nil))
 }
