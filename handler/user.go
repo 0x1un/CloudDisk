@@ -120,8 +120,14 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-
 	// TODO: get username and signup time from postgres db
+	data, err := db.GetUserInfo(username)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
+	users := util.NewRespJson(0, "Ok", data)
+	w.Write(users.JsonBytes())
 }
 
 // UserProfileHandler: get user info
