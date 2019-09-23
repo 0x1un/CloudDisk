@@ -109,6 +109,21 @@ func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
+	// uri => /user/info
+	// username and signup time
+	// validate to token expiretime
+	r.ParseForm()
+	username := r.Form.Get("username")
+	token := r.Form.Get("token")
+	if !isValidToken(token) {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	// TODO: get username and signup time from postgres db
+}
+
 // UserProfileHandler: get user info
 func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -137,5 +152,15 @@ func GenerateToken(username string) string {
 		return string(runes)
 	}(timestamp)
 	data := util.ComputeMD5FromString(fmt.Sprintf("%s%s%s", username, timestamp, "_biubiubiuxxxoo"))
-	return fmt.Sprintf("%s%s%s", data, timestamp[:8], reverseTimeStamp)
+	return fmt.Sprintf("%s%s%s", data, reverseTimeStamp, timestamp)
+}
+
+func isValidToken(token string) bool {
+	expireTime := 3
+	token = []rune(token)
+	timestamp := token[10:]
+	if (time.Now().Unix() - int64(timestamp)) > (60*60)*expireTime {
+		return false
+	}
+	return true
 }
