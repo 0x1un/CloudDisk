@@ -62,7 +62,7 @@ func UserLoginMatcher(username string, userpwd string) bool {
 func GetUserInfo(username string) (*Users, error) {
 	tmpUser := &Users{}
 	handler := pg.DBConnect().Table("users")
-	isNotFound := handler.Select("*").Where("user_name = ? and status = 1", username).Find(tmpUser).RecordNotFound()
+	isNotFound := handler.Select("user_name,signup_at").Where("user_name = ? and status = 1", username).Find(tmpUser.UserName, tmpUser.SignupAt).RecordNotFound()
 	if isNotFound {
 		return nil, errors.New("username does not exsists!")
 	}
