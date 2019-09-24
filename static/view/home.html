@@ -68,7 +68,7 @@
   window.onload = function () {
     var username = document.getElementById('username');
     $.ajax({
-      url: "/user/info?" + queryParams(),
+      url: "/user/profile?" + queryParams(),
       type: "POST",
       error: function (err) {
           alert(err);
@@ -78,7 +78,7 @@
         if (resp.code == 10005) {
           window.location.href = "/user/login";
         }
-        document.getElementById("username").innerHTML = resp.data.Username;
+        document.getElementById("username").innerHTML = resp.data.UserName;
         document.getElementById("regtime").innerHTML = resp.data.SignupAt;
         updateFileList();
       }
