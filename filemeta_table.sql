@@ -35,5 +35,5 @@ create table if not exists users (
 create table if not exists user_tokens(
     id serial not null primary key,
     user_name varchar(20) not null default '',
-    user_token varchar(48) not null default '' unique
+    user_token varchar not null default '' unique
 );
