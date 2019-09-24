@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/0x1un/CloudDisk/db"
@@ -109,7 +109,7 @@ func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
+func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 	// uri => /user/info
 	// username and signup time
 	// validate to token expiretime
@@ -130,26 +130,12 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(users.JsonBytes())
 }
 
-// UserProfileHandler: get user info
-func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	username := r.Form.Get("username")
-	user, err := db.GetUserInfo(username)
-	fmt.Println(user)
-	if err != nil {
-		w.Write([]byte(err.Error()))
-		return
-	}
-	data, _ := json.Marshal(user)
-	w.Write(data)
-	return
-}
-
 // GenerateToken: generate token with username
 func GenerateToken(username string) string {
-	// md5(username + timestamp + token_salt) + timestamp[:8] + reverse(timestamp)
+	// md5(username + timestamp + token_salt)  + reverse(timestamp)+ timestamp[:8]
 	// total length: 48
-	timestamp := fmt.Sprintf("%x", time.Now().Unix())
+	timestamp := fmt.Sprintf("%d", time.Now().Unix())
+	fmt.Println(timestamp)
 	reverseTimeStamp := func(timestamp string) string {
 		runes := []rune(timestamp)
 		for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
@@ -163,9 +149,13 @@ func GenerateToken(username string) string {
 
 func isValidToken(token string) bool {
 	expireTime := 3
-	token = []rune(token)
-	timestamp := token[10:]
-	if (time.Now().Unix() - int64(timestamp)) > (60*60)*expireTime {
+	token_ := []rune(token)
+	timestamp, err := strconv.ParseInt(string(token_[38:]), 10, 64)
+	if err != nil {
+		log.Println(err.Error())
+		return false
+	}
+	if (time.Now().Unix() - timestamp) > int64((60*60)*expireTime) {
 		return false
 	}
 	return true
