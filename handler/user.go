@@ -133,7 +133,7 @@ func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 // GenerateToken: generate token with username
 func GenerateToken(username string) string {
 	// md5(username + timestamp + token_salt)  + reverse(timestamp)+ timestamp[:8]
-	// total length: 48
+	// total length: 50
 	timestamp := fmt.Sprintf("%d", time.Now().Unix())
 	fmt.Println(timestamp)
 	reverseTimeStamp := func(timestamp string) string {
