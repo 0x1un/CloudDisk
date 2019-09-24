@@ -12,6 +12,8 @@ import (
 func main() {
 	log.Println("Starting server...")
 	log.Printf("Please open browser and paste the url: %s\n", "http://localhost"+util.Conf.Port)
+	fileServerHandler := http.FileServer(http.Dir("/home/admin/CODE/CloudDisk.bak/static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fileServerHandler))
 	http.HandleFunc("/file/upload", handler.UploadHandler)
 	http.HandleFunc("/file/upload/success", handler.UploadSuccessHandler)
 	http.HandleFunc("/file/meta", handler.GetFileMetaByMD5Handler)
