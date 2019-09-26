@@ -23,7 +23,7 @@ func main() {
 	http.HandleFunc("/file/delete", handler.DeleteFileHandler)
 	http.HandleFunc("/user/signup", handler.UserSignupHandler)
 	http.HandleFunc("/user/login", handler.UserLoginHandler)
-	http.HandleFunc("/user/profile", handler.UserProfileHandler)
+	http.HandleFunc("/user/profile", handler.HTTPInterceptorHandler(handler.UserProfileHandler))
 	http.HandleFunc("/home", handler.HomePageHandler)
 	log.Fatal(http.ListenAndServe(util.Conf.Port, nil))
 }
