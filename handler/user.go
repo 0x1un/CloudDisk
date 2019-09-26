@@ -148,6 +148,9 @@ func GenerateToken(username string) string {
 }
 
 func isValidToken(token string) bool {
+	if len(token) < 50 {
+		return false
+	}
 	expireTime := 3
 	token_ := []rune(token)
 	timestamp, err := strconv.ParseInt(string(token_[38:]), 10, 64)
