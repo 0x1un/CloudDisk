@@ -40,7 +40,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		fmeta := db.TableFileMeta{
 			FileName: fileHead.Filename,
 			Location: location,
-			UploadAt: time.Now().Format("2006-01-02 15:04:05"),
+			UploadAt: time.Now(),
 		}
 		newFile, err := os.Create(location)
 		if err != nil {
@@ -55,6 +55,20 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		fmeta.FileMD5 = util.ComputeFileMD5(location)
 		// filemeta.UpdateFileMeta(fmeta)
 		_ = filemeta.UpdateFileMetaDB(&fmeta)
+		r.ParseForm()
+		username := r.Form.Get("username")
+		succ := db.UploadUserFileDB(&db.UserFile{
+			UserName:   username,
+			FileMd5:    fmeta.FileMD5,
+			FileSize:   fmeta.FileSize,
+			FileName:   fmeta.FileName,
+			UploadAt:   fmeta.UploadAt,
+			LastUpdate: time.Now(),
+			Status:     0,
+		})
+		if !succ {
+			w.Write([]byte("Upload Failed!"))
+		}
 		defer newFile.Close()
 		http.Redirect(w, r, "/file/upload/success", http.StatusFound)
 	}
