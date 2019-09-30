@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	pg "github.com/0x1un/CloudDisk/db/pg"
 )
@@ -14,7 +15,7 @@ type TableFileMeta struct {
 	FileName string
 	FileSize int64
 	Location string
-	UploadAt string // format time: 2006-09-01 15:04:06
+	UploadAt time.Time `gorm:"default:current_time"` // format time: 2006-09-01 15:04:06
 	Status   int
 }
 
