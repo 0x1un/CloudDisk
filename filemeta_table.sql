@@ -37,3 +37,14 @@ create table if not exists user_tokens(
     user_name varchar(20) not null default '',
     user_token varchar not null default '' unique
 );
+
+create table if not exists user_files(
+    id serial not null primary key,
+    user_name varchar(20) not null default '',
+    file_md5 varchar(32) not null unique default '',
+    file_size numeric(20) default '0',
+    file_name varchar(256) not null default '',
+    upload_at timestamp default 'now',
+    last_update timestamp default 'now',
+    status smallint not null default '0'
+);
