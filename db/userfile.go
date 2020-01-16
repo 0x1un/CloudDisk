@@ -3,7 +3,7 @@ package db
 import (
 	"time"
 
-	pg "github.com/0x1un/CloudDisk/db/pg"
+	pg "0x1un/CloudDisk/db/pg"
 )
 
 // UserFile: 用户文件信息表

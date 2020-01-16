@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	db "github.com/0x1un/CloudDisk/db"
+	db "0x1un/CloudDisk/db"
 )
 
 // fileMetas: store file meta info

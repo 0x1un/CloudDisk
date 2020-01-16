@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	pg "github.com/0x1un/CloudDisk/db/pg"
-	"github.com/0x1un/CloudDisk/util"
+	pg "0x1un/CloudDisk/db/pg"
+	"0x1un/CloudDisk/util"
 )
 
 type Users struct {

@@ -1,7 +1,7 @@
 package filemeta
 
 import (
-	db "github.com/0x1un/CloudDisk/db"
+	db "0x1un/CloudDisk/db"
 )
 
 type ByUploadAtTime []db.TableFileMeta

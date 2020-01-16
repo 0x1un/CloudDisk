@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/0x1un/CloudDisk/db"
-	"github.com/0x1un/CloudDisk/util"
+	"0x1un/CloudDisk/db"
+	"0x1un/CloudDisk/util"
 )
 
 func UserSignupHandler(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +81,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		respJson := util.NewRespJson(
+		respJSON := util.NewRespJson(
 			0, "Ok", struct {
 				Location string
 				Username string
@@ -91,7 +91,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				Username: username,
 				Token:    token,
 			})
-		w.Write(respJson.JsonBytes())
+		w.Write(respJSON.JsonBytes())
 	}
 }
 
@@ -143,7 +143,7 @@ func GenerateToken(username string) string {
 		}
 		return string(runes)
 	}(timestamp)
-	data := util.ComputeMD5FromString(fmt.Sprintf("%s%s%s", username, timestamp, "_biubiubiuxxxoo"))
+	data := util.ComputeMD5FromString(fmt.Sprintf("%s%s%s", username, timestamp, "_biubiubiuxxxoo")) // TODO: replace salt with const
 	return fmt.Sprintf("%s%s%s", data, reverseTimeStamp, timestamp)
 }
 

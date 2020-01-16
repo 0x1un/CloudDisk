@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	pg "github.com/0x1un/CloudDisk/db/pg"
+	pg "0x1un/CloudDisk/db/pg"
 )
 
 // TableFileMeta: store filemeta

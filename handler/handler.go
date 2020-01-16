@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/0x1un/CloudDisk/db"
-	"github.com/0x1un/CloudDisk/filemeta"
-	"github.com/0x1un/CloudDisk/util"
+	"0x1un/CloudDisk/db"
+	"0x1un/CloudDisk/filemeta"
+	"0x1un/CloudDisk/util"
 )
 
 // UploadHandler: handing the file upload
